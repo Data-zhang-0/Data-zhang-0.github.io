@@ -1,0 +1,560 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>1. 协同过滤算法介绍 | cattle_coder</title><meta name="keywords" content="中等"><meta name="author" content="cattle_coder,344285081@qq.com"><meta name="copyright" content="cattle_coder"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="@[TOC] 1. 协同过滤算法介绍协同过滤（Collaborative Filtering）* 推荐算法是最经典、最常用的推荐算法。简称CF| 所谓协同过滤， 基本思想是根据用户之前的喜好以及其他兴趣相近的用户的选择来给用户推荐物品 (基于对用户历史行为数据的挖掘发现用户的喜好偏向， 并预测用户可能喜好的产品进行推荐)，一般是仅仅基于用户的行为数据（评价、购买、下载等）, 而不依赖于项的任何附加">
+<meta property="og:type" content="article">
+<meta property="og:title" content="1. 协同过滤算法介绍">
+<meta property="og:url" content="http://example.com/2021/05/03/%E5%8D%8F%E5%90%8C%E8%BF%87%E6%BB%A4%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:site_name" content="cattle_coder">
+<meta property="og:description" content="@[TOC] 1. 协同过滤算法介绍协同过滤（Collaborative Filtering）* 推荐算法是最经典、最常用的推荐算法。简称CF| 所谓协同过滤， 基本思想是根据用户之前的喜好以及其他兴趣相近的用户的选择来给用户推荐物品 (基于对用户历史行为数据的挖掘发现用户的喜好偏向， 并预测用户可能喜好的产品进行推荐)，一般是仅仅基于用户的行为数据（评价、购买、下载等）, 而不依赖于项的任何附加">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.bmp.ovh/imgs/2021/05/eaf454dab5bc4ede.jpeg">
+<meta property="article:published_time" content="2021-05-03T08:42:09.000Z">
+<meta property="article:modified_time" content="2021-05-05T12:34:31.035Z">
+<meta property="article:author" content="cattle_coder">
+<meta property="article:tag" content="中等">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.bmp.ovh/imgs/2021/05/eaf454dab5bc4ede.jpeg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2021/05/03/%E5%8D%8F%E5%90%8C%E8%BF%87%E6%BB%A4%E7%AE%97%E6%B3%95/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="yandex-verification" content="{&quot;enable&quot;:true,&quot;main&quot;:&quot;#49B1F5&quot;,&quot;paginator&quot;:&quot;#00c4b6&quot;,&quot;button_hover&quot;:&quot;#FF7242&quot;,&quot;text_selection&quot;:&quot;#00c4b6&quot;,&quot;link_color&quot;:&quot;#99a9bf&quot;,&quot;meta_color&quot;:&quot;#858585&quot;,&quot;hr_color&quot;:&quot;#A4D8FA&quot;,&quot;code_foreground&quot;:&quot;#F47466&quot;,&quot;code_background&quot;:&quot;rgba(27, 31, 35, .05)&quot;,&quot;toc_color&quot;:&quot;#00c4b6&quot;,&quot;blockquote_padding_color&quot;:&quot;#49b1f5&quot;,&quot;blockquote_background_color&quot;:&quot;#49b1f5&quot;}"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: cattle_coder","link":"链接: ","source":"来源: cattle_coder","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-05-05 20:34:31'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="cattle_coder" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" data-lazy-src="https://i.loli.net/2021/05/03/fjVLMHmWeun5wxX.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">15</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://i.bmp.ovh/imgs/2021/05/eaf454dab5bc4ede.jpeg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">cattle_coder</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">1. 协同过滤算法介绍</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-05-03T08:42:09.000Z" title="发表于 2021-05-03 16:42:09">2021-05-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-05-05T12:34:31.035Z" title="更新于 2021-05-05 20:34:31">2021-05-05</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/">推荐系统</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="1. 协同过滤算法介绍"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>@[TOC]</p>
+<h2 id="1-协同过滤算法介绍"><a href="#1-协同过滤算法介绍" class="headerlink" title="1. 协同过滤算法介绍"></a>1. 协同过滤算法介绍</h2><p>协同过滤（<strong>Collaborative Filtering）</strong>* 推荐算法是最经典、最常用的推荐算法。简称CF|</p>
+<p>所谓协同过滤， 基本思想是根据<strong>用户之前的喜好以及其他兴趣相近的用户的选择来给用户推荐物品</strong> (基于对用户历史行为数据的挖掘发现用户的喜好偏向， 并预测用户可能喜好的产品进行推荐)，一般是仅仅基于用户的行为数据（评价、购买、下载等）, 而不依赖于项的任何附加信息（物品自身特征）或者用户的任何附加信息（年龄， 性别等）。目前应用比较广泛的协同过滤算法是<strong>基于邻域的方法</strong>去分类，有下面两种算法：</p>
+<ul>
+<li>基于用户的协同过滤算法(UserCF): 给用户推荐和他兴趣相似的其他用户喜欢的产品</li>
+<li>基于物品的协同过滤算法(ItemCF): 给用户推荐和他之前喜欢的物品相似的物品<br>不管是UserCF还是ItemCF算法， 非常重要的步骤之一就是计算用户和用户或者物品和物品之间的相似度， 所以下面先整理常用的相似性度量方法， 然后再对每个算法的具体细节进行展开</li>
+</ul>
+<p><strong>基于模型的协同过滤</strong></p>
+<ul>
+<li>奇异值分解（SVD）</li>
+<li>潜在语义分析（LSA） </li>
+<li>支持向量机（SVM）</li>
+</ul>
+<h2 id="2-相似性度量方法"><a href="#2-相似性度量方法" class="headerlink" title="2. 相似性度量方法"></a>2. 相似性度量方法</h2><ul>
+<li>余弦相似度：<br>余弦相似度衡量了两个向量的夹角，夹角越小越相似。公式如下： $$ sim_{uv}=\frac{|N(u)| \cap |N(v)|}{\sqrt{|N(u)|\cdot|N(v)|}} $$<br>  从向量的角度进行描述，令矩阵$A$为用户-商品交互矩阵(因为是TopN推荐并不需要用户对物品的评分，只需要知道用户对商品是否有交互就行)，即矩阵的每一行表示一个用户对所有商品的交互情况，有交互的商品值为1没有交互的商品值为0，矩阵的列表示所有商品。若用户和商品数量分别为$m,n$的话，交互矩阵$A$就是一个$m$行$n$列的矩阵。此时用户的相似度可以表示为(其中$u\cdot v$指的是向量点积)： $$ sim_{uv} = cos(u,v) =\frac{u\cdot v}{|u|\cdot |v|} $$  </li>
+</ul>
+<p>其取值范围是[-1,1],夹角越小，余弦值越接近于1，它们的方向越吻合，则越相似</p>
+<ul>
+<li>皮尔逊相关系数：</li>
+</ul>
+<p>皮尔逊相关系数的公式与余弦相似度的计算公式非常的类似,其中$r_{ui},r_{vi}$分别表示用户$u$和用户$v$对商品$i$是否有交互(或者具体的评分值)： $$ sim_{uv} = \frac{\sum_i r_{ui}<em>r_{vi}}{\sqrt{\sum_i r_{ui}^2}\sqrt{\sum_i r_{vi}^2}} $$ 如下是皮尔逊相关系数计算公式，其中$r_{ui},r_{vi}$分别表示用户$u$和用户$v$对商品$i$是否有交互(或者具体的评分值)，$\bar r_u, \bar r_v$分别表示用户$u$和用户$v$交互的*<em>所有商品交互数量或者具体评分的平均值。</em></em> $$ sim(u,v)=\frac{\sum_{i\in I}(r_{ui}-\bar r_u)(r_{vi}-\bar r_v)}{\sqrt{\sum_{i\in I }(r_{ui}-\bar r_u)^2}\sqrt{\sum_{i\in I }(r_{vi}-\bar r_v)^2}} $$ 所以相比余弦相似度，皮尔逊相关系数通过使用用户的平均分对各独立评分进行修正，减小了用户评分偏置的影响。具体实现， 我们也是可以调包。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#这就是一种方法</span></span><br><span class="line"><span class="keyword">from</span> scipy.stats <span class="keyword">import</span> pearsonr</span><br><span class="line">i = [<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]</span><br><span class="line">j = [<span class="number">1</span>, <span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0</span>]</span><br><span class="line">pearsonr(i, j)</span><br><span class="line"><span class="comment">#返回值的第一项是皮尔森相关系数，第二项是p_value值。</span></span><br><span class="line"><span class="comment"># 一般来说皮尔森相关系数越大，p_value越小，线性相关性就越大。</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>(0.8164965809277258, 0.1835034190722742)
+</code></pre>
+<ul>
+<li>杰卡德(Jaccard)相似系数：</li>
+</ul>
+<p>一般计算交集与并集的，计算评分0,1布尔值相似。两个用户$u$和$v$交互商品交集的数量占这两个用户交互商品并集的数量的比例，称为两个集合的杰卡德相似系数，用符号$sim_{uv}$表示，其中$N(u),N(v)$分别表示用户$u$和用户$v$交互商品的集合。 $$ sim_{uv}=\frac{|N(u) \cap N(v)|}{\sqrt{|N(u)| \cup|N(v)|}} $$  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-基于用户的协同过滤"><a href="#3-基于用户的协同过滤" class="headerlink" title="3. 基于用户的协同过滤"></a>3. 基于用户的协同过滤</h2><p>图像中的ALice和cary两者的信息比较相似，所以我们可以基于用户，根据alice的信息去推算出Cary的泰坦尼克号评分信息</p>
+<ul>
+<li><p>UserCF算法主要包括两个步骤：</p>
+<p>1、找到和目标用户兴趣相似的集合<br>2、找到这个集合中的用户喜欢的， 且目标用户没有听说过的物品推荐给目标用户。</p>
+</li>
+</ul>
+<p>[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-xsDgP4fl-1603368735944)(attachment:image.png)]</p>
+<h2 id="4-UserCF编程实现"><a href="#4-UserCF编程实现" class="headerlink" title="4. UserCF编程实现"></a>4. UserCF编程实现</h2><p>首先， 先把数据表给建立起来</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 定义数据集， 也就是那个表格， 注意这里我们采用字典存放数据， 因为实际情况中数据是非常稀疏的， 很少有情况是现在这样</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">loadData</span>():</span></span><br><span class="line">    items=&#123;<span class="string">&#x27;A&#x27;</span>: &#123;<span class="number">1</span>: <span class="number">5</span>, <span class="number">2</span>: <span class="number">3</span>, <span class="number">3</span>: <span class="number">4</span>, <span class="number">4</span>: <span class="number">3</span>, <span class="number">5</span>: <span class="number">1</span>&#125;,</span><br><span class="line">           <span class="string">&#x27;B&#x27;</span>: &#123;<span class="number">1</span>: <span class="number">3</span>, <span class="number">2</span>: <span class="number">1</span>, <span class="number">3</span>: <span class="number">3</span>, <span class="number">4</span>: <span class="number">3</span>, <span class="number">5</span>: <span class="number">5</span>&#125;,</span><br><span class="line">           <span class="string">&#x27;C&#x27;</span>: &#123;<span class="number">1</span>: <span class="number">4</span>, <span class="number">2</span>: <span class="number">2</span>, <span class="number">3</span>: <span class="number">4</span>, <span class="number">4</span>: <span class="number">1</span>, <span class="number">5</span>: <span class="number">5</span>&#125;,</span><br><span class="line">           <span class="string">&#x27;D&#x27;</span>: &#123;<span class="number">1</span>: <span class="number">4</span>, <span class="number">2</span>: <span class="number">3</span>, <span class="number">3</span>: <span class="number">3</span>, <span class="number">4</span>: <span class="number">5</span>, <span class="number">5</span>: <span class="number">2</span>&#125;,</span><br><span class="line">           <span class="string">&#x27;E&#x27;</span>: &#123;<span class="number">2</span>: <span class="number">3</span>, <span class="number">3</span>: <span class="number">5</span>, <span class="number">4</span>: <span class="number">4</span>, <span class="number">5</span>: <span class="number">1</span>&#125;</span><br><span class="line">          &#125;</span><br><span class="line">    users=&#123;<span class="number">1</span>: &#123;<span class="string">&#x27;A&#x27;</span>: <span class="number">5</span>, <span class="string">&#x27;B&#x27;</span>: <span class="number">3</span>, <span class="string">&#x27;C&#x27;</span>: <span class="number">4</span>, <span class="string">&#x27;D&#x27;</span>: <span class="number">4</span>&#125;,</span><br><span class="line">           <span class="number">2</span>: &#123;<span class="string">&#x27;A&#x27;</span>: <span class="number">3</span>, <span class="string">&#x27;B&#x27;</span>: <span class="number">1</span>, <span class="string">&#x27;C&#x27;</span>: <span class="number">2</span>, <span class="string">&#x27;D&#x27;</span>: <span class="number">3</span>, <span class="string">&#x27;E&#x27;</span>: <span class="number">3</span>&#125;,</span><br><span class="line">           <span class="number">3</span>: &#123;<span class="string">&#x27;A&#x27;</span>: <span class="number">4</span>, <span class="string">&#x27;B&#x27;</span>: <span class="number">3</span>, <span class="string">&#x27;C&#x27;</span>: <span class="number">4</span>, <span class="string">&#x27;D&#x27;</span>: <span class="number">3</span>, <span class="string">&#x27;E&#x27;</span>: <span class="number">5</span>&#125;,</span><br><span class="line">           <span class="number">4</span>: &#123;<span class="string">&#x27;A&#x27;</span>: <span class="number">3</span>, <span class="string">&#x27;B&#x27;</span>: <span class="number">3</span>, <span class="string">&#x27;C&#x27;</span>: <span class="number">1</span>, <span class="string">&#x27;D&#x27;</span>: <span class="number">5</span>, <span class="string">&#x27;E&#x27;</span>: <span class="number">4</span>&#125;,</span><br><span class="line">           <span class="number">5</span>: &#123;<span class="string">&#x27;A&#x27;</span>: <span class="number">1</span>, <span class="string">&#x27;B&#x27;</span>: <span class="number">5</span>, <span class="string">&#x27;C&#x27;</span>: <span class="number">5</span>, <span class="string">&#x27;D&#x27;</span>: <span class="number">2</span>, <span class="string">&#x27;E&#x27;</span>: <span class="number">1</span>&#125;</span><br><span class="line">          &#125;</span><br><span class="line">    <span class="keyword">return</span> items,users</span><br><span class="line"></span><br><span class="line">items, users = loadData()</span><br><span class="line">item_df = pd.DataFrame(items).T</span><br><span class="line">user_df = pd.DataFrame(users).T</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(item_df)</span><br><span class="line"><span class="built_in">print</span>(user_df)</span><br></pre></td></tr></table></figure>
+
+<pre><code>     1    2    3    4    5
+A  5.0  3.0  4.0  3.0  1.0
+B  3.0  1.0  3.0  3.0  5.0
+C  4.0  2.0  4.0  1.0  5.0
+D  4.0  3.0  3.0  5.0  2.0
+E  NaN  3.0  5.0  4.0  1.0
+     A    B    C    D    E
+1  5.0  3.0  4.0  4.0  NaN
+2  3.0  1.0  2.0  3.0  3.0
+3  4.0  3.0  4.0  3.0  5.0
+4  3.0  3.0  1.0  5.0  4.0
+5  1.0  5.0  5.0  2.0  1.0
+</code></pre>
+<ul>
+<li><p>计算用户相似性矩阵:</p>
+<p>这个是一个共现矩阵, 5*5，行代表每个用户， 列代表每个用户， 值代表用户和用户的相关性，这里的思路是这样， 因为要求用户和用户两两的相关性， 所以需要用双层循环遍历用户-物品评分数据， 当不是同一个用户的时候， 我们要去遍历物品-用户评分数据， 在里面去找这两个用户同时对该物品评过分的数据放入到这两个用户向量中。</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="string">&quot;&quot;&quot;计算用户相似性矩阵&quot;&quot;&quot;</span></span><br><span class="line">similarity_matrix = pd.DataFrame(np.zeros((<span class="built_in">len</span>(users), <span class="built_in">len</span>(users))), index=[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>], columns=[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 遍历每条用户-物品评分数据</span></span><br><span class="line"><span class="keyword">for</span> userID <span class="keyword">in</span> users:</span><br><span class="line">    <span class="keyword">for</span> otheruserId <span class="keyword">in</span> users:</span><br><span class="line">        vec_user = []</span><br><span class="line">        vec_otheruser = []</span><br><span class="line">        <span class="keyword">if</span> userID != otheruserId:</span><br><span class="line">            <span class="keyword">for</span> itemId <span class="keyword">in</span> items:   <span class="comment"># 遍历物品-用户评分数据</span></span><br><span class="line">                itemRatings = items[itemId]        <span class="comment"># 这也是个字典  每条数据为所有用户对当前物品的评分</span></span><br><span class="line">                <span class="keyword">if</span> userID <span class="keyword">in</span> itemRatings <span class="keyword">and</span> otheruserId <span class="keyword">in</span> itemRatings:  <span class="comment"># 说明两个用户都对该物品评过分</span></span><br><span class="line">                    vec_user.append(itemRatings[userID])</span><br><span class="line">                    vec_otheruser.append(itemRatings[otheruserId])</span><br><span class="line">            <span class="comment"># 这里可以获得相似性矩阵(共现矩阵)</span></span><br><span class="line">            similarity_matrix[userID][otheruserId] = np.corrcoef(np.array(vec_user), np.array(vec_otheruser))[<span class="number">0</span>][<span class="number">1</span>]</span><br><span class="line">            <span class="comment">#similarity_matrix[userID][otheruserId] = cosine_similarity(np.array(vec_user), np.array(vec_otheruser))[0][1]</span></span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">similarity_matrix</span><br></pre></td></tr></table></figure>
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+<pre><code>.dataframe tbody tr th &#123;
+    vertical-align: top;
+&#125;
+
+.dataframe thead th &#123;
+    text-align: right;
+&#125;
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>0.000000</td>
+      <td>0.852803</td>
+      <td>0.707107</td>
+      <td>0.000000</td>
+      <td>-0.792118</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>0.852803</td>
+      <td>0.000000</td>
+      <td>0.467707</td>
+      <td>0.489956</td>
+      <td>-0.900149</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>0.707107</td>
+      <td>0.467707</td>
+      <td>0.000000</td>
+      <td>-0.161165</td>
+      <td>-0.466569</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>0.000000</td>
+      <td>0.489956</td>
+      <td>-0.161165</td>
+      <td>0.000000</td>
+      <td>-0.641503</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>-0.792118</td>
+      <td>-0.900149</td>
+      <td>-0.466569</td>
+      <td>-0.641503</td>
+      <td>0.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<p>  <strong>计算前n个相似的用户</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;&quot;&quot;计算前n个相似的用户&quot;&quot;&quot;</span></span><br><span class="line">n = <span class="number">2</span></span><br><span class="line">similarity_users = similarity_matrix[<span class="number">1</span>].sort_values(ascending=<span class="literal">False</span>)[:n].index.tolist()    <span class="comment"># [2, 3]   也就是用户1和用户2</span></span><br></pre></td></tr></table></figure>
+
+<p> <strong>计算最终得分</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;&quot;&quot;计算最终得分&quot;&quot;&quot;</span></span><br><span class="line">base_score = np.mean(np.array([value <span class="keyword">for</span> value <span class="keyword">in</span> users[<span class="number">1</span>].values()]))</span><br><span class="line">weighted_scores = <span class="number">0.</span></span><br><span class="line">corr_values_sum = <span class="number">0.</span></span><br><span class="line"><span class="keyword">for</span> user <span class="keyword">in</span> similarity_users:  <span class="comment"># [2, 3]</span></span><br><span class="line">    corr_value = similarity_matrix[<span class="number">1</span>][user]            <span class="comment"># 两个用户之间的相似性</span></span><br><span class="line">    mean_user_score = np.mean(np.array([value <span class="keyword">for</span> value <span class="keyword">in</span> users[user].values()]))    <span class="comment"># 每个用户的打分平均值</span></span><br><span class="line">    weighted_scores += corr_value * (users[user][<span class="string">&#x27;E&#x27;</span>]-mean_user_score)      <span class="comment"># 加权分数</span></span><br><span class="line">    corr_values_sum += corr_value</span><br><span class="line">final_scores = base_score + weighted_scores / corr_values_sum</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;用户Alice对物品5的打分: &#x27;</span>, final_scores)</span><br><span class="line">user_df.loc[<span class="number">1</span>][<span class="string">&#x27;E&#x27;</span>] = final_scores</span><br><span class="line">user_df</span><br></pre></td></tr></table></figure>
+
+<pre><code>用户Alice对物品5的打分:  4.871979899370592
+</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+<pre><code>.dataframe tbody tr th &#123;
+    vertical-align: top;
+&#125;
+
+.dataframe thead th &#123;
+    text-align: right;
+&#125;
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>A</th>
+      <th>B</th>
+      <th>C</th>
+      <th>D</th>
+      <th>E</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>5.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>4.87198</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3.0</td>
+      <td>1.0</td>
+      <td>2.0</td>
+      <td>3.0</td>
+      <td>3.00000</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>4.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+      <td>3.0</td>
+      <td>5.00000</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>3.0</td>
+      <td>3.0</td>
+      <td>1.0</td>
+      <td>5.0</td>
+      <td>4.00000</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>1.0</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>1.00000</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<h2 id="5-、基于物品的协同过滤"><a href="#5-、基于物品的协同过滤" class="headerlink" title="5 、基于物品的协同过滤"></a>5 、基于物品的协同过滤</h2><p>基于物品的协同过滤，图片中泰坦尼克号和阿甘正传，阿甘正传和机器人总动员相似。我们目测这两行比较相似：因此喜欢泰坦尼克号的也有可能喜欢阿甘正传</p>
+<ul>
+<li><p>基于物品的协同过滤算法主要分为两步：</p>
+<p>1)、计算物品之间的相似度</p>
+<p>2)、根据物品的相似度和用户的历史行为给用户生成推荐列表（购买了该商品的用户也经常购买的其他商品）</p>
+</li>
+</ul>
+<p>[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-H1wLnI7O-1603368735966)(attachment:image.png)]</p>
+<h2 id="6-ItemCF编程实现"><a href="#6-ItemCF编程实现" class="headerlink" title="6.ItemCF编程实现"></a>6.ItemCF编程实现</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;&quot;&quot;计算物品的相似矩阵&quot;&quot;&quot;</span></span><br><span class="line">similarity_matrix = pd.DataFrame(np.ones((<span class="built_in">len</span>(items), <span class="built_in">len</span>(items))), index=[<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;D&#x27;</span>, <span class="string">&#x27;E&#x27;</span>], columns=[<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;D&#x27;</span>, <span class="string">&#x27;E&#x27;</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 遍历每条物品-用户评分数据</span></span><br><span class="line"><span class="keyword">for</span> itemId <span class="keyword">in</span> items:</span><br><span class="line">    <span class="keyword">for</span> otheritemId <span class="keyword">in</span> items:</span><br><span class="line">        vec_item = []         <span class="comment"># 定义列表， 保存当前两个物品的向量值</span></span><br><span class="line">        vec_otheritem = []</span><br><span class="line">        <span class="comment">#userRagingPairCount = 0     # 两件物品均评过分的用户数</span></span><br><span class="line">        <span class="keyword">if</span> itemId != otheritemId:    <span class="comment"># 物品不同</span></span><br><span class="line">            <span class="keyword">for</span> userId <span class="keyword">in</span> users:    <span class="comment"># 遍历用户-物品评分数据</span></span><br><span class="line">                userRatings = users[userId]    <span class="comment"># 每条数据为该用户对所有物品的评分， 这也是个字典</span></span><br><span class="line">                </span><br><span class="line">                <span class="keyword">if</span> itemId <span class="keyword">in</span> userRatings <span class="keyword">and</span> otheritemId <span class="keyword">in</span> userRatings:   <span class="comment"># 用户对这两个物品都评过分</span></span><br><span class="line">                    <span class="comment">#userRagingPairCount += 1</span></span><br><span class="line">                    vec_item.append(userRatings[itemId])</span><br><span class="line">                    vec_otheritem.append(userRatings[otheritemId])</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 这里可以获得相似性矩阵(共现矩阵)</span></span><br><span class="line">            similarity_matrix[itemId][otheritemId] = np.corrcoef(np.array(vec_item), np.array(vec_otheritem))[<span class="number">0</span>][<span class="number">1</span>]</span><br><span class="line">            <span class="comment">#similarity_matrix[itemId][otheritemId] = cosine_similarity(np.array(vec_item), np.array(vec_otheritem))[0][1]</span></span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">similarity_matrix</span><br></pre></td></tr></table></figure>
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+<pre><code>.dataframe tbody tr th &#123;
+    vertical-align: top;
+&#125;
+
+.dataframe thead th &#123;
+    text-align: right;
+&#125;
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>A</th>
+      <th>B</th>
+      <th>C</th>
+      <th>D</th>
+      <th>E</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>A</td>
+      <td>1.000000</td>
+      <td>-0.476731</td>
+      <td>-0.123091</td>
+      <td>0.532181</td>
+      <td>0.969458</td>
+    </tr>
+    <tr>
+      <td>B</td>
+      <td>-0.476731</td>
+      <td>1.000000</td>
+      <td>0.645497</td>
+      <td>-0.310087</td>
+      <td>-0.478091</td>
+    </tr>
+    <tr>
+      <td>C</td>
+      <td>-0.123091</td>
+      <td>0.645497</td>
+      <td>1.000000</td>
+      <td>-0.720577</td>
+      <td>-0.427618</td>
+    </tr>
+    <tr>
+      <td>D</td>
+      <td>0.532181</td>
+      <td>-0.310087</td>
+      <td>-0.720577</td>
+      <td>1.000000</td>
+      <td>0.581675</td>
+    </tr>
+    <tr>
+      <td>E</td>
+      <td>0.969458</td>
+      <td>-0.478091</td>
+      <td>-0.427618</td>
+      <td>0.581675</td>
+      <td>1.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<p>然后也是得到与物品5相似的前n个物品， 计算出最终得分来</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;&quot;&quot;得到与物品5相似的前n个物品&quot;&quot;&quot;</span></span><br><span class="line">n = <span class="number">2</span></span><br><span class="line">similarity_items = similarity_matrix[<span class="string">&#x27;E&#x27;</span>].sort_values(ascending=<span class="literal">False</span>)[<span class="number">1</span>:n+<span class="number">1</span>].index.tolist()       <span class="comment"># [&#x27;A&#x27;, &#x27;D&#x27;]</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;计算最终得分&quot;&quot;&quot;</span></span><br><span class="line">base_score = np.mean(np.array([value <span class="keyword">for</span> value <span class="keyword">in</span> items[<span class="string">&#x27;E&#x27;</span>].values()]))</span><br><span class="line">weighted_scores = <span class="number">0.</span></span><br><span class="line">corr_values_sum = <span class="number">0.</span></span><br><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> similarity_items:  <span class="comment"># [&#x27;A&#x27;, &#x27;D&#x27;]</span></span><br><span class="line">    corr_value = similarity_matrix[<span class="string">&#x27;E&#x27;</span>][item]            <span class="comment"># 两个物品之间的相似性</span></span><br><span class="line">    mean_item_score = np.mean(np.array([value <span class="keyword">for</span> value <span class="keyword">in</span> items[item].values()]))    <span class="comment"># 每个物品的打分平均值</span></span><br><span class="line">    weighted_scores += corr_value * (users[<span class="number">1</span>][item]-mean_item_score)      <span class="comment"># 加权分数</span></span><br><span class="line">    corr_values_sum += corr_value</span><br><span class="line">final_scores = base_score + weighted_scores / corr_values_sum</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;用户Alice对物品5的打分: &#x27;</span>, final_scores)</span><br><span class="line">user_df.loc[<span class="number">1</span>][<span class="string">&#x27;E&#x27;</span>] = final_scores</span><br><span class="line">user_df</span><br></pre></td></tr></table></figure>
+
+<pre><code>用户Alice对物品5的打分:  4.6
+</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+<pre><code>.dataframe tbody tr th &#123;
+    vertical-align: top;
+&#125;
+
+.dataframe thead th &#123;
+    text-align: right;
+&#125;
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>A</th>
+      <th>B</th>
+      <th>C</th>
+      <th>D</th>
+      <th>E</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>5.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>4.6</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3.0</td>
+      <td>1.0</td>
+      <td>2.0</td>
+      <td>3.0</td>
+      <td>3.0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>4.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+      <td>3.0</td>
+      <td>5.0</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>3.0</td>
+      <td>3.0</td>
+      <td>1.0</td>
+      <td>5.0</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>1.0</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<h2 id="7-算法评估"><a href="#7-算法评估" class="headerlink" title="7. 算法评估"></a>7. 算法评估</h2><p>由于UserCF和ItemCF结果评估部分是共性知识点， 所以在这里统一标识。 这里介绍评测指标：</p>
+<ul>
+<li><p>召回率</p>
+<p>对用户u推荐N个物品记为$R(u)$, 令用户u在测试集上喜欢的物品集合为$T(u)$， 那么召回率定义为： $$ \operatorname{Recall}=\frac{\sum_{u}|R(u) \cap T(u)|}{\sum_{u}|T(u)|} $$ 这个意思就是说， 在用户真实购买或者看过的影片里面， 我模型真正预测出了多少， 这个考察的是模型推荐的一个全面性。</p>
+</li>
+<li><p>准确率:</p>
+<p>  准确率定义为： $$ \operatorname{Precision}=\frac{\sum_{u} \mid R(u) \cap T(u)|}{\sum_{u}|R(u)|} $$ 这个意思再说， 在我推荐的所有物品中， 用户真正看的有多少， 这个考察的是我模型推荐的一个准确性。 为了提高准确率， 模型需要把非常有把握的才对用户进行推荐， 所以这时候就减少了推荐的数量， 而这往往就损失了全面性， 真正预测出来的会非常少，所以实际应用中应该综合考虑两者的平衡。</p>
+</li>
+<li><p>覆盖率: </p>
+<p>  覆盖率反映了推荐算法发掘长尾的能力， 覆盖率越高， 说明推荐算法越能将长尾中的物品推荐给用户。 $$ \text { Coverage }=\frac{\left|\bigcup_{u \in U} R(u)\right|}{|I|} $$该覆盖率表示最终的推荐列表中包含多大比例的物品。如果所有物品都被给推荐给至少一个用户， 那么覆盖率是100%。</p>
+</li>
+<li><p>新颖度:</p>
+<p>  用推荐列表中物品的平均流行度度量推荐结果的新颖度。 如果推荐出的物品都很热门， 说明推荐的新颖度较低。 由于物品的流行度分布呈长尾分布， 所以为了流行度的平均值更加稳定， 在计算平均流行度时对每个物品的流行度取对数</p>
+</li>
+</ul>
+<h2 id="8、协同过滤算法的问题分析"><a href="#8、协同过滤算法的问题分析" class="headerlink" title="8、协同过滤算法的问题分析"></a>8、协同过滤算法的问题分析</h2><p>协同过滤算法存在的问题之一就是泛化能力弱， 即协同过滤无法将两个物品相似的信息推广到其他物品的相似性上。 导致的问题是热门物品具有很强的头部效应， 容易跟大量物品产生相似， 而尾部物品由于特征向量稀疏， 导致很少被推荐。</p>
+<p>为了解决这个问题， 同时增加模型的泛化能力，2006年，矩阵分解技术(Matrix Factorization,MF)</p>
+<h2 id="9、UserCF和ItemCF区别"><a href="#9、UserCF和ItemCF区别" class="headerlink" title="9、UserCF和ItemCF区别"></a>9、UserCF和ItemCF区别</h2><p>UserCF很强的社交特性， 这样的特点非常适于<strong>用户少， 物品多</strong>， 时效性较强的场合， 比如新闻推荐场景， 因为新闻本身兴趣点分散， 相比用户对不同新闻的兴趣偏好， 新闻的及时性，热点性往往更加重要， 所以正好适用于发现热点，跟踪热点的趋势。 另外还具有推荐新信息的能力， 更有可能发现惊喜, 因为看的是人与人的相似性, 推出来的结果可能更有惊喜，可以发现用户潜在但自己尚未察觉的兴趣爱好。<br>对于用户较少， 要求时效性较强的场合， 就可以考虑UserCF。</p>
+<p>ItemCF 这个更适用于兴趣变化较为稳定的应用， 更接近于个性化的推荐， 适合物品少，用户多，用户兴趣固定持久， 物品更新速度不是太快的场合， 比如推荐艺术品， 音乐， 电影。 下面是UserCF和ItemCF的优缺点对比： （来自项亮推荐系统实践）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="10、协同过滤优缺点"><a href="#10、协同过滤优缺点" class="headerlink" title="10、协同过滤优缺点"></a>10、协同过滤优缺点</h2><p>协同过滤作为一种经典的推荐算法种类，在工业界应用广泛，它的优点很多，模型通用性强，不需要太多对应数据领域的专业知识，工程实现简单，效果也不错。这些都是它流行的原因。</p>
+<p>　　　　当然，协同过滤也有些难以避免的难题，比如令人头疼的“冷启动”问题，我们没有新用户任何数据的时候，无法较好的为新用户推荐物品。同时也没有考虑情景的差异，比如根据用户所在的场景和用户当前的情绪。当然，也无法得到一些小众的独特喜好，这块是基于内容的推荐比较擅长的。</p>
+<p>最后。如果文章中有不足之处，请务必指出，一定迅速改正。谢谢</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:344285081@qq.com">cattle_coder</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2021/05/03/%E5%8D%8F%E5%90%8C%E8%BF%87%E6%BB%A4%E7%AE%97%E6%B3%95/">http://example.com/2021/05/03/%E5%8D%8F%E5%90%8C%E8%BF%87%E6%BB%A4%E7%AE%97%E6%B3%95/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">cattle_coder</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E4%B8%AD%E7%AD%89/">中等</a></div><div class="post_share"><div class="addthis_inline_share_toolbox"></div><script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=https://www.addthis.com/" async="async"></script></div></div><div class="post-reward"><div class="reward-button button--animated"><i class="fas fa-qrcode"></i> 打赏</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/" target="_blank"><img class="post-qr-code-img" data-lazy-src="/"/></a><div class="post-qr-code-desc"></div></li><li class="reward-item"><a href="/" target="_blank"><img class="post-qr-code-img" data-lazy-src="/"/></a><div class="post-qr-code-desc"></div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/05/03/%E9%9B%B6%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8%E9%87%91%E8%9E%8D%E9%A3%8E%E6%8E%A7%E4%B9%8B%E8%B4%B7%E6%AC%BE%E8%BF%9D%E7%BA%A6%E9%A2%84%E6%B5%8B%E7%9A%84Task2%EF%BC%9A%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/"><img class="prev-cover" data-lazy-src="https://i.loli.net/2021/05/05/QiopRZNWwbMKISH.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">零基础入门金融风控之贷款违约预测Task2：数据分析</div></div></a></div><div class="next-post pull-right"><a href="/2021/05/03/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%9F%A9%E9%98%B5%E5%88%86%E8%A7%A3%E5%92%8CFM%E6%A8%A1%E5%9E%8B/"><img class="next-cover" data-lazy-src="https://i.loli.net/2021/05/05/37SzAC8x5IFEfXN.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">隐语义模型与矩阵分解</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/05/03/GBDT+LR简介/" title="一. GBDT+LR简介"><img class="cover" data-lazy-src="https://i.loli.net/2019/12/25/8t97aVlp4hgyBGu.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-03</div><div class="title">一. GBDT+LR简介</div></div></a></div><div><a href="/2021/05/03/Wide和Deep模型/" title="Wide和Deep模型"><img class="cover" data-lazy-src="https://i.loli.net/2021/05/05/Utv7QgBwWfKL8XV.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-03</div><div class="title">Wide和Deep模型</div></div></a></div><div><a href="/2021/05/03/推荐系统task01：简介概述/" title="推荐系统task01：简介概述"><img class="cover" data-lazy-src="https://i.loli.net/2021/05/05/ZFInOwm1QGdP2La.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-03</div><div class="title">推荐系统task01：简介概述</div></div></a></div><div><a href="/2021/05/03/数据结构中迷宫问题求解/" title="数据结构中迷宫问题求解"><img class="cover" data-lazy-src="https://i.loli.net/2021/05/05/bEfPiLwUJ8OFeyC.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-03</div><div class="title">数据结构中迷宫问题求解</div></div></a></div><div><a href="/2021/05/03/推荐系统的矩阵分解和FM模型/" title="隐语义模型与矩阵分解"><img class="cover" data-lazy-src="https://i.loli.net/2021/05/05/37SzAC8x5IFEfXN.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-03</div><div class="title">隐语义模型与矩阵分解</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" data-lazy-src="https://i.loli.net/2021/05/03/fjVLMHmWeun5wxX.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">cattle_coder</div><div class="author-info__description">学习使我快乐</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">15</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Data-zhang-0"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">醒醒该干饭了</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%8D%8F%E5%90%8C%E8%BF%87%E6%BB%A4%E7%AE%97%E6%B3%95%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">1. 协同过滤算法介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%9B%B8%E4%BC%BC%E6%80%A7%E5%BA%A6%E9%87%8F%E6%96%B9%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">2. 相似性度量方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E7%9A%84%E5%8D%8F%E5%90%8C%E8%BF%87%E6%BB%A4"><span class="toc-number">3.</span> <span class="toc-text">3. 基于用户的协同过滤</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-UserCF%E7%BC%96%E7%A8%8B%E5%AE%9E%E7%8E%B0"><span class="toc-number">4.</span> <span class="toc-text">4. UserCF编程实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E3%80%81%E5%9F%BA%E4%BA%8E%E7%89%A9%E5%93%81%E7%9A%84%E5%8D%8F%E5%90%8C%E8%BF%87%E6%BB%A4"><span class="toc-number">5.</span> <span class="toc-text">5 、基于物品的协同过滤</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-ItemCF%E7%BC%96%E7%A8%8B%E5%AE%9E%E7%8E%B0"><span class="toc-number">6.</span> <span class="toc-text">6.ItemCF编程实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E7%AE%97%E6%B3%95%E8%AF%84%E4%BC%B0"><span class="toc-number">7.</span> <span class="toc-text">7. 算法评估</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8%E3%80%81%E5%8D%8F%E5%90%8C%E8%BF%87%E6%BB%A4%E7%AE%97%E6%B3%95%E7%9A%84%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90"><span class="toc-number">8.</span> <span class="toc-text">8、协同过滤算法的问题分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9%E3%80%81UserCF%E5%92%8CItemCF%E5%8C%BA%E5%88%AB"><span class="toc-number">9.</span> <span class="toc-text">9、UserCF和ItemCF区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10%E3%80%81%E5%8D%8F%E5%90%8C%E8%BF%87%E6%BB%A4%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="toc-number">10.</span> <span class="toc-text">10、协同过滤优缺点</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/05/03/GBDT+LR%E7%AE%80%E4%BB%8B/" title="一. GBDT+LR简介"><img data-lazy-src="https://i.loli.net/2019/12/25/8t97aVlp4hgyBGu.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="一. GBDT+LR简介"/></a><div class="content"><a class="title" href="/2021/05/03/GBDT+LR%E7%AE%80%E4%BB%8B/" title="一. GBDT+LR简介">一. GBDT+LR简介</a><time datetime="2021-05-03T08:42:09.000Z" title="发表于 2021-05-03 16:42:09">2021-05-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/05/03/Wide%E5%92%8CDeep%E6%A8%A1%E5%9E%8B/" title="Wide和Deep模型"><img data-lazy-src="https://i.loli.net/2021/05/05/Utv7QgBwWfKL8XV.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Wide和Deep模型"/></a><div class="content"><a class="title" href="/2021/05/03/Wide%E5%92%8CDeep%E6%A8%A1%E5%9E%8B/" title="Wide和Deep模型">Wide和Deep模型</a><time datetime="2021-05-03T08:42:09.000Z" title="发表于 2021-05-03 16:42:09">2021-05-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/05/03/Mindspore%E7%9A%84%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B/" title="Mindspore快速上手"><img data-lazy-src="https://i.loli.net/2021/05/05/advGj3UrV5CYlbc.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Mindspore快速上手"/></a><div class="content"><a class="title" href="/2021/05/03/Mindspore%E7%9A%84%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B/" title="Mindspore快速上手">Mindspore快速上手</a><time datetime="2021-05-03T08:42:09.000Z" title="发表于 2021-05-03 16:42:09">2021-05-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/05/03/python%E5%BC%80%E5%8F%91%E5%85%88%E5%88%9B%E5%BB%BA%E8%99%9A%E6%8B%9F%E7%8E%AF%E5%A2%83%E5%91%80/" title="python开发先创建虚拟环境呀"><img data-lazy-src="https://i.loli.net/2021/05/05/x3MJV49qNSnjhwe.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="python开发先创建虚拟环境呀"/></a><div class="content"><a class="title" href="/2021/05/03/python%E5%BC%80%E5%8F%91%E5%85%88%E5%88%9B%E5%BB%BA%E8%99%9A%E6%8B%9F%E7%8E%AF%E5%A2%83%E5%91%80/" title="python开发先创建虚拟环境呀">python开发先创建虚拟环境呀</a><time datetime="2021-05-03T08:42:09.000Z" title="发表于 2021-05-03 16:42:09">2021-05-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/05/03/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9Ftask01%EF%BC%9A%E7%AE%80%E4%BB%8B%E6%A6%82%E8%BF%B0/" title="推荐系统task01：简介概述"><img data-lazy-src="https://i.loli.net/2021/05/05/ZFInOwm1QGdP2La.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="推荐系统task01：简介概述"/></a><div class="content"><a class="title" href="/2021/05/03/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9Ftask01%EF%BC%9A%E7%AE%80%E4%BB%8B%E6%A6%82%E8%BF%B0/" title="推荐系统task01：简介概述">推荐系统task01：简介概述</a><time datetime="2021-05-03T08:42:09.000Z" title="发表于 2021-05-03 16:42:09">2021-05-03</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://i.bmp.ovh/imgs/2021/05/eaf454dab5bc4ede.jpeg')"><div id="footer-wrap"><div class="copyright">&copy;2021 By cattle_coder</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.9" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-nest.min.js"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
